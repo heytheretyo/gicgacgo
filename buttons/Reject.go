@@ -13,7 +13,7 @@ func RejectDuel(s *discordgo.Session, i *discordgo.InteractionCreate, player1 st
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: "respectfully, you are not authorized to respond to this invitation",
-				Flags:   1 << 6,
+				Flags:   discordgo.MessageFlagsEphemeral,
 			},
 		})
 		return

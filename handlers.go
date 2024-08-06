@@ -46,12 +46,12 @@ func handleButtonInteraction(s *discordgo.Session, i *discordgo.InteractionCreat
 	parts := strings.Split(i.MessageComponentData().CustomID, "_")
 	action := parts[0]
 	inviter := parts[1]
-	opponent := parts[2]
+	invitee := parts[2]
 
 	if action == "accept" {
-		buttonHandler["accept"](s, i, inviter, opponent)
+		buttonHandler["accept"](s, i, inviter, invitee)
 	} else if action == "decline" {
-		buttonHandler["reject"](s, i, inviter, opponent)
+		buttonHandler["reject"](s, i, inviter, invitee)
 	}
 }
 

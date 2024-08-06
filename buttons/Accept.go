@@ -8,34 +8,46 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func AcceptDuel(s *discordgo.Session, i *discordgo.InteractionCreate, player1 string, player2 string) {
-	if i.Member.User.ID != player2 {
+func AcceptDuel(s *discordgo.Session, i *discordgo.InteractionCreate, inviter string, invitee string) {
+	if i.Member.User.ID != invitee {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: "respectfully, you are not authorized to respond to this invitation",
-				Flags:   1 << 6,
+				Flags:   discordgo.MessageFlagsEphemeral,
 			},
 		})
 		return
 	}
 
-	gameID := fmt.Sprintf("%s_%s", player1, player2)
+	if shared.Players[invitee] != nil {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "sorry, ure already in a game",
+				Flags:   discordgo.MessageFlagsEphemeral,
+			},
+		})
+		return
+	}
 
-	shared.Players[player1] = &shared.Player{GameId: gameID, Id: player1}
-	shared.Players[player2] = &shared.Player{GameId: gameID, Id: player2}
+	gameId := fmt.Sprintf("%s_%s", inviter, invitee)
 
-	shared.Games[gameID] = &shared.Game{
+	shared.Players[inviter] = &shared.Player{GameId: gameId, Id: inviter}
+	shared.Players[invitee] = &shared.Player{GameId: gameId, Id: invitee}
+
+	shared.Games[gameId] = &shared.Game{
 		StartedTimestamp: time.Now(),
-		Players:          []shared.Player{*shared.Players[player1], *shared.Players[player2]},
+		Players:          []shared.Player{*shared.Players[inviter], *shared.Players[invitee]},
 		Turn:             shared.RandomizeTurn(),
-		PlayerX:          *shared.Players[player1],
-		PlayerY:          *shared.Players[player2],
+		PlayerX:          *shared.Players[inviter],
+		PlayerY:          *shared.Players[invitee],
 		Game: shared.Board{
 			{"", "", ""},
 			{"", "", ""},
 			{"", "", ""},
 		},
+		ChannelId: i.ChannelID,
 	}
 
 	shared.DisableAllButtons(s, i)
@@ -43,9 +55,9 @@ func AcceptDuel(s *discordgo.Session, i *discordgo.InteractionCreate, player1 st
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("duel has started between <@%s> and <@%s>! Use `/place <x> <y>` to play.", player1, player2),
+			Content: fmt.Sprintf("duel has started between <@%s> and <@%s>! Use `/place <x> <y>` to play.", inviter, invitee),
 		},
 	})
 
-	shared.RenderBoard()
+	shared.StartGame(s, i, gameId)
 }

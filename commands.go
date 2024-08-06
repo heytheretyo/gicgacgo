@@ -36,13 +36,13 @@ func registerCommands(s *discordgo.Session) ([]*discordgo.ApplicationCommand, er
 			Name:        "place",
 			Description: "point in the grid to place ur marker",
 			Options: []*discordgo.ApplicationCommandOption{{
-				Name:        "x",
+				Name:        "row",
 				Type:        discordgo.ApplicationCommandOptionInteger,
 				Description: "row of the tictactoe grid",
 				Choices:     []*discordgo.ApplicationCommandOptionChoice{{Name: "one", Value: 1}, {Name: "two", Value: 2}, {Name: "three", Value: 3}},
 				Required:    true,
 			}, {
-				Name:        "y",
+				Name:        "col",
 				Type:        discordgo.ApplicationCommandOptionInteger,
 				Description: "column of the tictactoe grid",
 				Choices:     []*discordgo.ApplicationCommandOptionChoice{{Name: "one", Value: 1}, {Name: "two", Value: 2}, {Name: "three", Value: 3}},
@@ -54,6 +54,7 @@ func registerCommands(s *discordgo.Session) ([]*discordgo.ApplicationCommand, er
 
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
+		// ! CURRENTLY USING MY GUILD
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, "1263867338164539463", v)
 		if err != nil {
 			slog.Error("cannot create command", slog.String("command", v.Name), slog.Any("error", err))
@@ -66,6 +67,7 @@ func registerCommands(s *discordgo.Session) ([]*discordgo.ApplicationCommand, er
 
 func removeCommands(s *discordgo.Session, commands []*discordgo.ApplicationCommand) {
 	for _, v := range commands {
+		// ! CURRENTLY USING MY GUILD
 		err := s.ApplicationCommandDelete(s.State.User.ID, "1263867338164539463", v.ID)
 		if err != nil {
 			slog.Error("cannot delete command", slog.String("command", v.Name), slog.Any("error", err))
