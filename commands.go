@@ -15,7 +15,7 @@ func registerCommands(s *discordgo.Session) ([]*discordgo.ApplicationCommand, er
 			Name: "leaderboard",
 			Options: []*discordgo.ApplicationCommandOption{{
 				Name:        "type",
-				Type:        discordgo.ApplicationCommandOptionUser,
+				Type:        discordgo.ApplicationCommandOptionString,
 				Choices:     []*discordgo.ApplicationCommandOptionChoice{{Name: "local", Value: "local"}, {Name: "global", Value: "global"}},
 				Description: "scope of the placement",
 				Required:    true,
